@@ -63,7 +63,7 @@ packages:
     revision: 54891ff40455ca94a37641b9da4604647878cc07
     version: 0.1.1
     source:
-      Git: git@github.com:pulp-platform/axi_stream.git
+      Git: https://github.com/pulp-platform/axi_stream.git
     dependencies:
     - common_cells
   axi_vga:
@@ -92,8 +92,8 @@ packages:
     - common_cells
     - register_interface
   common_cells:
-    revision: 13f28aa0021fc22c0d01a12d618fda58d2c93239
-    version: 1.33.0
+    revision: 7773d971b9d7bef7f5f6a2ef36ee1e4d02cefcd3
+    version: 1.34.0
     source:
       Git: https://github.com/pulp-platform/common_cells.git
     dependencies:
@@ -117,7 +117,7 @@ packages:
     - redundancy_cells
     - tech_cells_generic
   ethernet:
-    revision: d7d14161b8f129bccfcf9717f33760cb0a027856
+    revision: e3cf735a8df0ecb8e446631386d2d814899a41af
     version: null
     source:
       Git: git@github.com:pulp-platform/pulp-ethernet.git
@@ -145,22 +145,17 @@ packages:
     dependencies:
     - common_cells
   idma:
-    revision: a80fcace92b1562e7cd76c8615298b5623ba74d2
-    version: 0.6.0-beta
+    revision: d6245c8bf8faa7a4d44325d6584387170413d53d
+    version: 0.6.0
     source:
       Git: https://github.com/pulp-platform/iDMA.git
     dependencies:
     - axi
+    - axi_stream
     - common_cells
     - common_verification
-    - idma_gen
+    - obi
     - register_interface
-  idma_gen:
-    revision: null
-    version: null
-    source:
-      Path: .bender/git/checkouts/idma-77bf7fa56d324e6a/target/rtl
-    dependencies: []
   irq_router:
     revision: d1d31350b24f3965b3a51e1bc96c71eb34e94db3
     version: 0.0.1-beta.1
@@ -170,6 +165,14 @@ packages:
     - axi
     - common_cells
     - register_interface
+  obi:
+    revision: 1aa411df145c4ebdd61f8fed4d003c33f7b20636
+    version: 0.1.2
+    source:
+      Git: https://github.com/pulp-platform/obi.git
+    dependencies:
+    - common_cells
+    - common_verification
   opentitan_peripherals:
     revision: cd3153de2783abd3d03d0595e6c4b32413c62f14
     version: 0.4.0
@@ -190,13 +193,8 @@ packages:
     - register_interface
     - tech_cells_generic
   register_interface:
-<<<<<<< HEAD
-    revision: e25b36670ff7aab3402f40efcc2b11ee0f31cf19
-    version: 0.4.3
-=======
     revision: ae616e5a1ec2b41e72d200e5ab09c65e94aebd3d
     version: 0.4.4
->>>>>>> 0465402 (cleanup)
     source:
       Git: https://github.com/pulp-platform/register_interface.git
     dependencies:
