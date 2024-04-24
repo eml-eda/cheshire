@@ -159,6 +159,9 @@ CHS_SIM_ALL += $(CHS_ROOT)/target/sim/vsim/compile.cheshire_soc.tcl
 # FPGA Flow #
 #############
 
+$(CHS_ROOT)/target/xilinx/scripts/add_sources.tcl: Bender.yml
+	$(BENDER) script vivado -t fpga -t cv64a6_imafdcsclic_sv39 -t cva6 > $@
+
 include $(CHS_ROOT)/target/xilinx/xilinx.mk
 
 #################################
