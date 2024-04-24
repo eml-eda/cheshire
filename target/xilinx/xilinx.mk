@@ -1,91 +1,93 @@
-# Copyright 2024 ETH Zurich and University of Bologna.
+# Copyright 2022 ETH Zurich and University of Bologna.
 # Licensed under the Apache License, Version 2.0, see LICENSE for details.
 # SPDX-License-Identifier: Apache-2.0
-
+#
 # Nicole Narr <narrn@student.ethz.ch>
 # Christopher Reinwardt <creinwar@student.ethz.ch>
-# Cyril Koenig <cykoenig@iis.ee.ethz.ch>
-# Paul Scheffler <paulsc@iis.ee.ethz.ch>
 
-VIVADO ?= vitis-2022.1 vivado
+PROJECT      ?= zcu102
+# Board in {genesys2, zcu104, zcu102, pynq-z1}
+BOARD          = zcu102
+XILINX_PORT  ?= 3332
+XILINX_HOST  ?= bordcomputer
 
-CHS_XILINX_DIR ?= $(CHS_ROOT)/target/xilinx
 
-# Required to split stems
-.SECONDEXPANSION:
+ifeq ($(BOARD),genesys2)
+	XILINX_PART  ?= xc7k325tffg900-2
+	XILINX_BOARD ?= digilentinc.com:genesys2:part0:1.1
+	ips-names    := xlnx_mig_7_ddr3 xlnx_clk_wiz xlnx_vio
+	FPGA_PATH    ?= xilinx_tcf/Digilent/200300A8C60DB
+endif
+ifeq ($(BOARD),zcu104)
+	XILINX_PART  = xczu7ev-ffvc1156-2-e
+	XILINX_BOARD = xilinx.com:zcu104:part0:1.1
+	# ips-names      := xlnx_mig_ddr4 xlnx_clk_wiz xlnx_vio
+	ips := xlnx_mig_ddr4.xci
+endif
+ifeq ($(BOARD),zcu102)
+	XILINX_PART = xczu9eg-ffvb1156-2-e
+	XILINX_BOARD = xilinx.com:zcu102:part0:3.4
+	# ips := xlnx_mig_ddr4.xci
+endif
+ifeq ($(BOARD),pynq-z1)
+	XILINX_PART = xc7z020clg400-1
+	XILINX_BOARD = www.digilentinc.com:pynq-z1:part0:1.0
+endif
 
-##############
-# Xilinx IPs #
-##############
+# Location of ip outputs
+# ips := $(addprefix $(CAR_XIL_DIR)/,$(addsuffix .xci ,$(basename $(ips-names))))
 
-.PRECIOUS: $(CHS_XILINX_DIR)/build/%/ $(CHS_XILINX_DIR)/build/%/out.xci
+out := out
+bit := $(out)/$(PROJECT)_top_xilinx.bit
+mcs := $(out)/$(PROJECT)_top_xilinx.mcs
+BIT ?= $(bit)
 
-$(CHS_XILINX_DIR)/build/%/:
-	mkdir -p $@
+VIVADOENV ?=  PROJECT=$(PROJECT)            \
+              BOARD=$(BOARD)                \
+              XILINX_PART=$(XILINX_PART)    \
+              XILINX_BOARD=$(XILINX_BOARD)  \
+              PORT=$(XILINX_PORT)           \
+              HOST=$(XILINX_HOST)           \
+              FPGA_PATH=$(FPGA_PATH)        \
+              BIT=$(BIT)
 
-# We split the stem into a board and an IP and resolve dependencies accordingly
-$(CHS_XILINX_DIR)/build/%/out.xci: \
-		$(CHS_XILINX_DIR)/scripts/impl_ip.tcl \
-		$$(wildcard $(CHS_XILINX_DIR)/src/ips/$$*.prj) \
-		| $(CHS_XILINX_DIR)/build/%/
-	@rm -f $(CHS_XILINX_DIR)/build/$(*)*.log $(CHS_XILINX_DIR)/build/$(*)*.jou
-	cd $| && $(VIVADO) -mode batch -log ../$*.log -jou ../$*.jou -source $< -tclargs "$(subst ., ,$*)"
+# select IIS-internal tool commands if we run on IIS machines
+ifneq (,$(wildcard /etc/iis.version))
+	VIVADO ?= vitis-2022.1 vivado
+else
+	VIVADO ?= vivado
+endif
 
-##############
-# Bitstreams #
-##############
+VIVADOFLAGS ?= -nojournal -mode batch
 
-CHS_XILINX_BOARDS := genesys2 vcu128
+ip-dir  := xilinx
 
-CHS_XILINX_IPS_genesys2 := clkwiz vio mig7s
-CHS_XILINX_IPS_vcu128   := clkwiz vio ddr4
+all: $(mcs)
 
-$(CHS_XILINX_DIR)/scripts/add_sources.%.tcl: $(CHS_ROOT)/Bender.yml
-	$(BENDER) script vivado -t fpga -t cv64a6_imafdcsclic_sv39 -t cva6 -t $* > $@
+# Generate mcs from bitstream
+$(mcs): $(bit)
+	$(VIVADOENV) $(VIVADO) $(VIVADOFLAGS) -source scripts/write_cfgmem.tcl -tclargs $@ $^
 
-define chs_xilinx_bit_rule
-$$(CHS_XILINX_DIR)/out/%.$(1).bit: \
-		$$(CHS_XILINX_DIR)/scripts/impl_sys.tcl \
-		$$(CHS_XILINX_DIR)/scripts/add_sources.$(1).tcl \
-		$$(CHS_XILINX_IPS_$(1):%=$(CHS_XILINX_DIR)/build/$(1).%/out.xci) \
-		$$(CHS_HW_ALL) \
-		| $$(CHS_XILINX_DIR)/build/$(1).%/
-	@rm -f $$(CHS_XILINX_DIR)/build/$$*.$(1)*.log $$(CHS_XILINX_DIR)/build/$$*.$(1)*.jou
-	cd $$| && $$(VIVADO) -mode batch -log ../$$*.$(1).log -jou ../$$*.$(1).jou -source $$< \
-		-tclargs "$(1) $$* $$(CHS_XILINX_IPS_$(1):%=$$(CHS_XILINX_DIR)/build/$(1).%/out.xci)"
+$(bit): $(ips)
+	@mkdir -p $(out)
+	$(VIVADOENV) $(VIVADO) $(VIVADOFLAGS) -source scripts/prologue.tcl -source scripts/run.tcl
+	cp $(PROJECT).runs/impl_1/$(PROJECT)* ./$(out)
 
-.PHONY: chs-xilinx-$(1)
-chs-xilinx-$(1): $$(CHS_XILINX_DIR)/out/cheshire.$(1).bit
-endef
+$(ips):
+	@echo "Generating IP $(basename $@)"
+	cd $(ip-dir)/$(basename $@) && $(MAKE) clean && $(VIVADOENV) VIVADO="$(VIVADO)" $(MAKE)
+	cp $(ip-dir)/$(basename $@)/$(basename $@).srcs/sources_1/ip/$(basename $@)/$@ $@
 
-$(foreach board,$(CHS_XILINX_BOARDS),$(eval $(call chs_xilinx_bit_rule,$(board))))
 
-# Builds bitstreams for all available boards
-CHS_XILINX_ALL = $(foreach board,$(CHS_XILINX_BOARDS),$$(CHS_XILINX_DIR)/out/cheshire.$(board).bit)
+gui:
+	@echo "Starting $(VIVADO) GUI"
+	@$(VIVADOENV) $(VIVADO) -nojournal -mode gui $(PROJECT).xpr &
 
-#############
-# Utilities #
-#############
+program:
+	@echo "Programming board $(BOARD) ($(XILINX_PART))"
+	$(VIVADOENV) $(VIVADO) $(VIVADOFLAGS) -source scripts/program.tcl
 
-# Parameters for HW server (defaults are for a unique board @ localhost).
-# `CHS_XILINX_HWS_PATH_$(board)` overrides the device path for each board (default *).
-CHS_XILINX_HWS_URL ?= localhost:3121
+clean:
+	rm -rf *.log *.jou *.str *.mif *.xci *.xpr .Xil/ $(out) $(PROJECT).cache $(PROJECT).hw $(PROJECT).ioplanning $(PROJECT).ip_user_files $(PROJECT).runs $(PROJECT).sim
 
-# We build the dependency file $(2) only if it does not exist; it must not be up to date.
-define chs_xilinx_util_rule
-chs-xilinx-$(1)-%: $$(CHS_XILINX_DIR)/scripts/util/$(1).tcl | $$(CHS_XILINX_DIR)/build/%.$(1)/
-	[ -e $(subst %,$$*,$(2)) ] || $$(MAKE) $(subst %,$$*,$(2))
-	@rm -f $$(CHS_XILINX_DIR)/build/$$(*)*.$(1).log $$(CHS_XILINX_DIR)/build/$$(*)*.$(1).jou
-	cd $$| && $$(VIVADO) -mode batch -log ../$$(*).$(1).log -jou ../$$(*).$(1).jou -source $$< \
-		-tclargs "$$(CHS_XILINX_HWS_URL) $$(or $$(CHS_XILINX_HWS_PATH_$$*),*) $$* $(subst %,$$*,$(2)) 0"
-endef
-
-# Program bitstream onto board
-.PHONY: chs-xilinx-program-%
-$(eval $(call chs_xilinx_util_rule,program,$(CHS_XILINX_DIR)/out/cheshire.%.bit))
-
-# Flash onboard memory with the file `CHS_XILINX_FLASH_IMG` (only selected boards).
-# `%` is substituted with the board name. The default is the Linux disk image for that board.
-CHS_XILINX_FLASH_IMG ?= $(CHS_SW_DIR)/boot/linux.%.gpt.bin
-.PHONY: chs-xilinx-flash-%
-$(eval $(call chs_xilinx_util_rule,flash,$(CHS_XILINX_FLASH_IMG)))
+.PHONY: clean
