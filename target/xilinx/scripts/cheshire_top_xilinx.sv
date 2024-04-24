@@ -5,7 +5,7 @@
 // Nicole Narr <narrn@student.ethz.ch>
 // Christopher Reinwardt <creinwar@student.ethz.ch>
 
-`include "typedef.svh"
+`include "cheshire/typedef.svh"
 
 module cheshire_top_xilinx
   import cheshire_pkg::*;
@@ -488,6 +488,9 @@ module cheshire_top_xilinx
     .I  ( gpio_out            ), //Buffer input
     .T  ( ~gpio_en            ) //3-state enable input, high = input, low = output
   );
+
+assign
+
 
 
 
