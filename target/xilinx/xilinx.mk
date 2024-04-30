@@ -8,8 +8,8 @@
 PROJECT      ?= zcu102
 # Board in {genesys2, zcu104, zcu102, pynq-z1}
 BOARD          = zcu102
-XILINX_PORT  ?= 3332
-XILINX_HOST  ?= bordcomputer
+XILINX_PORT  ?= 3121
+XILINX_HOST  ?= imodium.polito.it
 
 
 ifeq ($(BOARD),genesys2)
@@ -25,8 +25,9 @@ ifeq ($(BOARD),zcu104)
 	ips := xlnx_mig_ddr4.xci
 endif
 ifeq ($(BOARD),zcu102)
-	XILINX_PART = xczu9eg-ffvb1156-2-e
+	XILINX_PART  = xczu9eg-ffvb1156-2-e
 	XILINX_BOARD = xilinx.com:zcu102:part0:3.4
+	FPGA_PATH    ?= xilinx_tcf/Digilent/210308A5F4C8
 	# ips := xlnx_mig_ddr4.xci
 endif
 ifeq ($(BOARD),pynq-z1)
@@ -37,9 +38,11 @@ endif
 # Location of ip outputs
 # ips := $(addprefix $(CAR_XIL_DIR)/,$(addsuffix .xci ,$(basename $(ips-names))))
 
+SOC := cheshire_top_xilinx_wrapper
+
 out := out
-bit := $(out)/$(PROJECT)_top_xilinx.bit
-mcs := $(out)/$(PROJECT)_top_xilinx.mcs
+bit := $(out)/${SOC}.bit
+mcs := $(out)/${SOC}.mcs
 BIT ?= $(bit)
 
 VIVADOENV ?=  PROJECT=$(PROJECT)            \
@@ -53,7 +56,7 @@ VIVADOENV ?=  PROJECT=$(PROJECT)            \
 
 # select IIS-internal tool commands if we run on IIS machines
 ifneq (,$(wildcard /etc/iis.version))
-	VIVADO ?= vitis-2022.1 vivado
+	VIVADO ?= vivado
 else
 	VIVADO ?= vivado
 endif
@@ -62,7 +65,7 @@ VIVADOFLAGS ?= -nojournal -mode batch
 
 ip-dir  := xilinx
 
-all: $(mcs)
+all: $(bit)
 
 # Generate mcs from bitstream
 $(mcs): $(bit)
@@ -71,10 +74,10 @@ $(mcs): $(bit)
 $(bit): $(ips)
 	@mkdir -p $(out)
 	$(VIVADOENV) $(VIVADO) $(VIVADOFLAGS) -source scripts/prologue.tcl -source scripts/run.tcl
-	cp $(PROJECT).runs/impl_1/$(PROJECT)* ./$(out)
+	cp $(PROJECT).runs/impl_1/cheshire_top_xilinx_wrapper* ./$(out)
 
 $(ips):
-	@echo "Generating IP $(basename $@)"
+	@echo "Generating IP $(basename $@)" 
 	cd $(ip-dir)/$(basename $@) && $(MAKE) clean && $(VIVADOENV) VIVADO="$(VIVADO)" $(MAKE)
 	cp $(ip-dir)/$(basename $@)/$(basename $@).srcs/sources_1/ip/$(basename $@)/$@ $@
 

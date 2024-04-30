@@ -1,4 +1,4 @@
-//Wrapper of the system --Al these signals appear in the constraints file
+//Wrapper of the system --All these signals appear in the constraints file
 module cheshire_top_xilinx_wrapper (
     //System signals
     input logic         sysclk_p,
@@ -17,13 +17,13 @@ module cheshire_top_xilinx_wrapper (
     inout wire          i2c_scl_io,
     inout wire          i2c_sda_io,
     //GPIO 
-    inout wire  [29:0]  gpio_io,
+    inout wire  [29:0]  gpio_io
     //SD
-    input logic         sd_cd_i,
-    output logic        sd_cmd_o,
-    inout wire  [3:0]   sd_d_io,
-    output logic        sd_reset_o,
-    output logic        sd_sclk_o
+    //input logic         sd_cd_i,
+    //output logic        sd_cmd_o,
+    //inout wire  [3:0]   sd_d_io,
+    //output logic        sd_reset_o,
+    //output logic        sd_sclk_o
   );
   
   cheshire_top_xilinx cheshire_top_xilinx_instance (
@@ -42,11 +42,11 @@ module cheshire_top_xilinx_wrapper (
     .i2c_scl_io(i2c_scl_io),
     .i2c_sda_io(i2c_sda_io),
     .gpio_io(gpio_io),
-    .sd_cd_i(sd_cd_i),
-    .sd_cmd_o(sd_cmd_o),
-    .sd_d_io(sd_d_io),
-    .sd_reset_o(sd_reset_o),
-    .sd_sclk_o(sd_sclk_o),
+    .sd_cd_i(),
+    .sd_cmd_o(),
+    .sd_d_io(),
+    .sd_reset_o(),
+    .sd_sclk_o(),
     //We leave this part in tri-state
     .fan_sw(),
     .fan_pwm(),

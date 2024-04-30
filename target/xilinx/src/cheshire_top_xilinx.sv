@@ -5,7 +5,7 @@
 // Nicole Narr <narrn@student.ethz.ch>
 // Christopher Reinwardt <creinwar@student.ethz.ch>
 
-`include "typedef.svh"
+`include "cheshire/typedef.svh"
 
 module cheshire_top_xilinx
   import cheshire_pkg::*;
@@ -55,9 +55,9 @@ module cheshire_top_xilinx
   // Configure cheshire for FPGA mapping
   localparam cheshire_cfg_t FPGACfg = '{
     // CVA6 parameters
-    Cva6RASDepth      : ariane_pkg::ArianeDefaultConfig.RASDepth,
-    Cva6BTBEntries    : ariane_pkg::ArianeDefaultConfig.BTBEntries,
-    Cva6BHTEntries    : ariane_pkg::ArianeDefaultConfig.BHTEntries,
+    Cva6RASDepth      : 2,
+    Cva6BTBEntries    : 32,
+    Cva6BHTEntries    : 128,
     Cva6NrPMPEntries  : 0,
     Cva6ExtCieLength  : 'h2000_0000,
     // Harts

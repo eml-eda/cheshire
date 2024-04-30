@@ -6,6 +6,8 @@
 # Christopher Reinwardt <creinwar@student.ethz.ch>
 # Paul Scheffler <paulsc@iis.ee.ethz.ch>
 
+CHS_ROOT ?= ${shell pwd}
+
 # Override this as needed
 CHS_SW_GCC_BINROOT ?= $(dir $(shell which riscv64-unknown-elf-gcc))
 CHS_SW_DTC     ?= dtc

@@ -12,7 +12,7 @@ VLOG_ARGS ?= -suppress 2583 -suppress 13314
 VSIM      ?= vsim
 
 # Define used paths (prefixed to avoid name conflicts)
-CHS_ROOT      ?= $(shell $(BENDER) path cheshire)
+CHS_ROOT ?= $(shell pwd)
 CHS_REG_DIR   := $(shell $(BENDER) path register_interface)
 CHS_SLINK_DIR := $(shell $(BENDER) path serial_link)
 CHS_LLC_DIR   := $(shell $(BENDER) path axi_llc)

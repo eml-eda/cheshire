@@ -3,6 +3,9 @@
 # SPDX-License-Identifier: SHL-0.51
 #
 # Author: Florian Zaruba <zarubaf@iis.ee.ethz.ch>
+set current_script [info script]
+set current_directory [file dirname $current_script]
+
 
 # Ips selection
 switch $::env(BOARD) {
@@ -31,18 +34,21 @@ switch $::env(BOARD) {
 
 #read_ip $ips
 
-source scripts/add_sources.tcl
+source $current_directory/add_sources.tcl
 
 set_property top cheshire_top_xilinx_wrapper [current_fileset]
 
 update_compile_order -fileset sources_1
 
-add_files -fileset constrs_1 -norecurse constraints/$project.xdc
+add_files -fileset constrs_1 -norecurse $current_directory/../constraints/$project.xdc
+add_files -fileset constrs_1 -norecurse $current_directory/../constraints/cheshire.xdc
 
 set_property strategy Flow_PerfOptimized_high [get_runs synth_1]
 set_property strategy Performance_ExtraTimingOpt [get_runs impl_1]
 
 set_property XPM_LIBRARIES XPM_MEMORY [current_project]
+
+set_param general.maxThreads 8
 
 synth_design -rtl -name rtl_1
 
@@ -64,7 +70,7 @@ report_clock_interaction                                                -file re
 
 launch_runs impl_1
 wait_on_run impl_1
-launch_runs impl_1 -to_step write_bitstream
+launch_runs impl_1 -to_step write_bitstream -jobs 8
 wait_on_run impl_1
 
 #Check timing constraints

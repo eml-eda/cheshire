@@ -14,7 +14,6 @@ set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets cpu_reset_IBUF_inst/O]
 
 # Hyperbus
 # 10MHz
-set period_hyperbus 100
 # create_clock -period [expr $period_hyperbus] -name rwds0_clk [get_ports pad_hyper_rwds[0]]
 # set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets gen_hyper_phy[0].padinst_hyper_rwds0/iobuf_i/O]
 
@@ -23,10 +22,7 @@ set period_hyperbus 100
 # set clk_rwds_delayed_inv_pin [get_pins i_iguana/i_hyperbus/i_phy/i_phy/i_trx/i_rx_rwds_cdc_fifo/src_clk_i]
 
 
-set clk_rx_shift [expr $period_hyperbus/10]
-set rwds_input_delay [expr $period_hyperbus/4]
-# create_generated_clock -name clk_rwds_delayed0 -edges {1 2 3} -edge_shift "$clk_rx_shift $clk_rx_shift $clk_rx_shift" \
-  -source [get_ports FMC_hyper0_rwds] $clk_rwds_delayed_pin
+# create_generated_clock -name clk_rwds_delayed0 -edges {1 2 3} -edge_shift "$clk_rx_shift $clk_rx_shift $clk_rx_shift" -source [get_ports FMC_hyper0_rwds] $clk_rwds_delayed_pin
 # set_clock_latency [expr ${rwds_input_delay}] clk_rwds_delayed0
 
 # create_generated_clock -name clk_rwds_sample0 -invert  -divide_by 1 -source $clk_rwds_delayed_pin $clk_rwds_delayed_inv_pin
@@ -838,7 +834,7 @@ set rwds_input_delay [expr $period_hyperbus/4]
 #set_property PACKAGE_PIN B9       [get_ports "SFP_SI5328_OUT_C_N"] ;# Bank 230 - MGTREFCLK1N_230
 #set_property PACKAGE_PIN B10      [get_ports "SFP_SI5328_OUT_C_P"] ;# Bank 230 - MGTREFCLK1P_230
 ################################################################################
-### PS Side 
+### PS Side
 ################################################################################
 #Other net   PACKAGE_PIN AF16     - MIO0_QSPI_LWR_CLK         Bank 500 - PS_MIO0
 #Other net   PACKAGE_PIN AJ16     - MIO1_QSPI_LWR_DQ1         Bank 500 - PS_MIO1
@@ -1114,65 +1110,65 @@ set_property -dict {PACKAGE_PIN B21 IOSTANDARD LVCMOS33} [get_ports jtag_trst_i]
 
 # GPIOS mapping
 ######################################################################
-set_property -dict {PACKAGE_PIN C21 IOSTANDARD LVCMOS33} [get_ports gpio_io[0]]  ;# Bank  47 VCCO - VCC3V3   - IO_L10P_AD2P_47
-set_property -dict {PACKAGE_PIN C22 IOSTANDARD LVCMOS33} [get_ports gpio_io[1]]  ;# Bank  47 VCCO - VCC3V3   - IO_L9N_AD3N_47
-set_property -dict {PACKAGE_PIN D21 IOSTANDARD LVCMOS33} [get_ports gpio_io[2]]  ;# Bank  47 VCCO - VCC3V3   - IO_L9P_AD3P_47
+set_property -dict {PACKAGE_PIN C21 IOSTANDARD LVCMOS33} [get_ports {gpio_io[0]}]
+set_property -dict {PACKAGE_PIN C22 IOSTANDARD LVCMOS33} [get_ports {gpio_io[1]}]
+set_property -dict {PACKAGE_PIN D21 IOSTANDARD LVCMOS33} [get_ports {gpio_io[2]}]
 
 
 ## PMOD 1   Other part of the GPIOs
 ######################################################################
 # GPIOs mapping
-set_property -dict {PACKAGE_PIN D20 IOSTANDARD LVCMOS33} [get_ports gpio_io[3]]  ;# Bank  47 VCCO - VCC3V3   - IO_L8N_HDGC_AD4N_47
-set_property -dict {PACKAGE_PIN E20 IOSTANDARD LVCMOS33} [get_ports gpio_io[4]]  ;# Bank  47 VCCO - VCC3V3   - IO_L8P_HDGC_AD4P_47
-set_property -dict {PACKAGE_PIN D22 IOSTANDARD LVCMOS33} [get_ports gpio_io[5]]  ;# Bank  47 VCCO - VCC3V3   - IO_L7N_HDGC_AD5N_47
-set_property -dict {PACKAGE_PIN E22 IOSTANDARD LVCMOS33} [get_ports gpio_io[6]]  ;# Bank  47 VCCO - VCC3V3   - IO_L7P_HDGC_AD5P_47
-set_property -dict {PACKAGE_PIN F20 IOSTANDARD LVCMOS33} [get_ports gpio_io[7]]  ;# Bank  47 VCCO - VCC3V3   - IO_L6N_HDGC_AD6N_47
-set_property -dict {PACKAGE_PIN G20 IOSTANDARD LVCMOS33} [get_ports gpio_io[8]] ;# Bank  47 VCCO - VCC3V3   - IO_L6P_HDGC_AD6P_47
-set_property -dict {PACKAGE_PIN J20 IOSTANDARD LVCMOS33} [get_ports gpio_io[9]]  ;# Bank  47 VCCO - VCC3V3   - IO_L4N_AD8N_47
-set_property -dict {PACKAGE_PIN J19 IOSTANDARD LVCMOS33} [get_ports gpio_io[10]] ;# Bank  47 VCCO - VCC3V3   - IO_L4P_AD8P_47
+set_property -dict {PACKAGE_PIN D20 IOSTANDARD LVCMOS33} [get_ports {gpio_io[3]}]
+set_property -dict {PACKAGE_PIN E20 IOSTANDARD LVCMOS33} [get_ports {gpio_io[4]}]
+set_property -dict {PACKAGE_PIN D22 IOSTANDARD LVCMOS33} [get_ports {gpio_io[5]}]
+set_property -dict {PACKAGE_PIN E22 IOSTANDARD LVCMOS33} [get_ports {gpio_io[6]}]
+set_property -dict {PACKAGE_PIN F20 IOSTANDARD LVCMOS33} [get_ports {gpio_io[7]}]
+set_property -dict {PACKAGE_PIN G20 IOSTANDARD LVCMOS33} [get_ports {gpio_io[8]}]
+set_property -dict {PACKAGE_PIN J20 IOSTANDARD LVCMOS33} [get_ports {gpio_io[9]}]
+set_property -dict {PACKAGE_PIN J19 IOSTANDARD LVCMOS33} [get_ports {gpio_io[10]}]
 
 
 ######################################################################
 # Rest of the GPIOS mapping
 ######################################################################
 #LED 0
-set_property -dict {PACKAGE_PIN AG14 IOSTANDARD LVCMOS33} [get_ports gpio_io[11]]  ;# Bank  44 VCCO - VCC3V3   - IO_L10P_AD2P_44
+set_property -dict {PACKAGE_PIN AG14 IOSTANDARD LVCMOS33} [get_ports {gpio_io[11]}]
 #LED 1
-set_property -dict {PACKAGE_PIN AF13 IOSTANDARD LVCMOS33} [get_ports gpio_io[12]]  ;# Bank  44 VCCO - VCC3V3   - IO_L9N_AD3N_44
+set_property -dict {PACKAGE_PIN AF13 IOSTANDARD LVCMOS33} [get_ports {gpio_io[12]}]
 #LED 2
-set_property -dict {PACKAGE_PIN AE13 IOSTANDARD LVCMOS33} [get_ports gpio_io[13]]  ;# Bank  44 VCCO - VCC3V3   - IO_L9P_AD3P_44
+set_property -dict {PACKAGE_PIN AE13 IOSTANDARD LVCMOS33} [get_ports {gpio_io[13]}]
 #LED 3
-set_property -dict {PACKAGE_PIN AJ14 IOSTANDARD LVCMOS33} [get_ports gpio_io[14]]  ;# Bank  44 VCCO - VCC3V3   - IO_L8N_HDGC_AD4N_44
+set_property -dict {PACKAGE_PIN AJ14 IOSTANDARD LVCMOS33} [get_ports {gpio_io[14]}]
 #LED 4
-set_property -dict {PACKAGE_PIN AJ15 IOSTANDARD LVCMOS33} [get_ports gpio_io[15]]  ;# Bank  44 VCCO - VCC3V3   - IO_L8P_HDGC_AD4P_44
+set_property -dict {PACKAGE_PIN AJ15 IOSTANDARD LVCMOS33} [get_ports {gpio_io[15]}]
 #LED 5
-set_property -dict {PACKAGE_PIN AH13 IOSTANDARD LVCMOS33} [get_ports gpio_io[16]]  ;# Bank  44 VCCO - VCC3V3   - IO_L7N_HDGC_AD5N_44
+set_property -dict {PACKAGE_PIN AH13 IOSTANDARD LVCMOS33} [get_ports {gpio_io[16]}]
 #LED 6
-set_property -dict {PACKAGE_PIN AH14 IOSTANDARD LVCMOS33} [get_ports gpio_io[17]]  ;# Bank  44 VCCO - VCC3V3   - IO_L7P_HDGC_AD5P_44
+set_property -dict {PACKAGE_PIN AH14 IOSTANDARD LVCMOS33} [get_ports {gpio_io[17]}]
 #LED 6
-set_property -dict {PACKAGE_PIN AL12 IOSTANDARD LVCMOS33} [get_ports gpio_io[18]]  ;# Bank  44 VCCO - VCC3V3   - IO_L6N_HDGC_AD6N_44
+set_property -dict {PACKAGE_PIN AL12 IOSTANDARD LVCMOS33} [get_ports {gpio_io[18]}]
 #Directional Push Button - North
-set_property -dict {PACKAGE_PIN AG15 IOSTANDARD LVCMOS33} [get_ports gpio_io[19]]  ;# Bank  44 VCCO - VCC3V3   - IO_L11N_AD1N_44
+set_property -dict {PACKAGE_PIN AG15 IOSTANDARD LVCMOS33} [get_ports {gpio_io[19]}]
 #Directional Push Button - East
-set_property -dict {PACKAGE_PIN AE14 IOSTANDARD LVCMOS33} [get_ports gpio_io[20]]  ;# Bank  44 VCCO - VCC3V3   - IO_L12N_AD0N_44
+set_property -dict {PACKAGE_PIN AE14 IOSTANDARD LVCMOS33} [get_ports {gpio_io[20]}]
 #Directional Push Button - West
-set_property -dict {PACKAGE_PIN AF15 IOSTANDARD LVCMOS33} [get_ports gpio_io[21]]  ;# Bank  44 VCCO - VCC3V3   - IO_L11P_AD1P_44
+set_property -dict {PACKAGE_PIN AF15 IOSTANDARD LVCMOS33} [get_ports {gpio_io[21]}]
 #Directional Push Button - South
-set_property -dict {PACKAGE_PIN AE15 IOSTANDARD LVCMOS33} [get_ports gpio_io[22]]  ;# Bank  44 VCCO - VCC3V3   - IO_L12P_AD0P_44
+set_property -dict {PACKAGE_PIN AE15 IOSTANDARD LVCMOS33} [get_ports {gpio_io[22]}]
 #Directional Push Button - Center
-set_property -dict {PACKAGE_PIN AG13 IOSTANDARD LVCMOS33} [get_ports gpio_io[23]]  ;# Bank  44 VCCO - VCC3V3   - IO_L10N_AD2N_44
+set_property -dict {PACKAGE_PIN AG13 IOSTANDARD LVCMOS33} [get_ports {gpio_io[23]}]
 #DIP SW2
-set_property -dict {PACKAGE_PIN AM14 IOSTANDARD LVCMOS33} [get_ports gpio_io[24]]   ;# Bank  44 VCCO - VCC3V3   - IO_L2P_AD10P_44
+set_property -dict {PACKAGE_PIN AM14 IOSTANDARD LVCMOS33} [get_ports {gpio_io[24]}]
 #DIP SW3
-set_property -dict {PACKAGE_PIN AN13 IOSTANDARD LVCMOS33} [get_ports gpio_io[25]]   ;# Bank  44 VCCO - VCC3V3   - IO_L2N_AD10N_44
+set_property -dict {PACKAGE_PIN AN13 IOSTANDARD LVCMOS33} [get_ports {gpio_io[25]}]
 #DIP SW4
-set_property -dict {PACKAGE_PIN AN12 IOSTANDARD LVCMOS33} [get_ports gpio_io[26]]   ;# Bank  44 VCCO - VCC3V3   - IO_L3P_AD9P_44
+set_property -dict {PACKAGE_PIN AN12 IOSTANDARD LVCMOS33} [get_ports {gpio_io[26]}]
 #DIP SW5
-set_property -dict {PACKAGE_PIN AP12 IOSTANDARD LVCMOS33} [get_ports gpio_io[27]]   ;# Bank  44 VCCO - VCC3V3   - IO_L3N_AD9N_44
+set_property -dict {PACKAGE_PIN AP12 IOSTANDARD LVCMOS33} [get_ports {gpio_io[27]}]
 #DIP SW6
-set_property -dict {PACKAGE_PIN AL13 IOSTANDARD LVCMOS33} [get_ports gpio_io[28]]   ;# Bank  44 VCCO - VCC3V3   - IO_L4P_AD8P_44
+set_property -dict {PACKAGE_PIN AL13 IOSTANDARD LVCMOS33} [get_ports {gpio_io[28]}]
 #DIP SW7
-set_property -dict {PACKAGE_PIN AK13 IOSTANDARD LVCMOS33} [get_ports gpio_io[29]]   ;# Bank  44 VCCO - VCC3V3   - IO_L6P_HDGC_AD6P_44
+set_property -dict {PACKAGE_PIN AK13 IOSTANDARD LVCMOS33} [get_ports {gpio_io[29]}]
 
 
 
@@ -1180,8 +1176,8 @@ set_property -dict {PACKAGE_PIN AK13 IOSTANDARD LVCMOS33} [get_ports gpio_io[29]
 ######################################################################
 # UART mapping
 ######################################################################
- set_property -dict {PACKAGE_PIN E13 IOSTANDARD LVCMOS33} [get_ports uart_rx_i] 
- set_property -dict {PACKAGE_PIN F13 IOSTANDARD LVCMOS33} [get_ports uart_tx_o]
+set_property -dict {PACKAGE_PIN E13 IOSTANDARD LVCMOS33} [get_ports uart_rx_i]
+set_property -dict {PACKAGE_PIN F13 IOSTANDARD LVCMOS33} [get_ports uart_tx_o]
 
 ######################################################################
 # System Clock mapping
@@ -1204,22 +1200,21 @@ set_property -dict {PACKAGE_PIN J11 IOSTANDARD LVCMOS33} [get_ports i2c_sda_io]
 ######################################################################
 # SD mapping
 ######################################################################
- set_property -dict {PACKAGE_PIN j25 IOSTANDARD LVCMOS33} [get_ports sd_d_io[0]]
- set_property -dict {PACKAGE_PIN L25 IOSTANDARD LVCMOS33} [get_ports sd_d_io[1]]
- set_property -dict {PACKAGE_PIN M25 IOSTANDARD LVCMOS33} [get_ports sd_d_io[2]]
- set_property -dict {PACKAGE_PIN K25 IOSTANDARD LVCMOS33} [get_ports sd_d_io[3]]
- set_property -dict {PACKAGE_PIN P25 IOSTANDARD LVCMOS33} [get_ports sd_cmd_o]
- set_property -dict {PACKAGE_PIN N23 IOSTANDARD LVCMOS33} [get_ports sd_sclk_o]
+#set_property -dict {PACKAGE_PIN J25 IOSTANDARD LVCMOS18} [get_ports sd_d_io[0]]
+#set_property -dict {PACKAGE_PIN L25 IOSTANDARD LVCMOS18} [get_ports sd_d_io[1]]
+#set_property -dict {PACKAGE_PIN M25 IOSTANDARD LVCMOS18} [get_ports sd_d_io[2]]
+#set_property -dict {PACKAGE_PIN K25 IOSTANDARD LVCMOS18} [get_ports sd_d_io[3]]
+#set_property -dict {PACKAGE_PIN P25 IOSTANDARD LVCMOS18} [get_ports sd_cmd_o]
+#set_property -dict {PACKAGE_PIN N23 IOSTANDARD LVCMOS18} [get_ports sd_sclk_o]
 
 ######################################################################
 # Boot Mode
 ######################################################################
-set_property -dict {PACKAGE_PIN AN14 IOSTANDARD LVCMOS33} [get_ports boot_mode_i[0]]
-set_property -dict {PACKAGE_PIN AP14 IOSTANDARD LVCMOS33} [get_ports boot_mode_i[1]]
+set_property -dict {PACKAGE_PIN AN14 IOSTANDARD LVCMOS33} [get_ports {boot_mode_i[0]}]
+set_property -dict {PACKAGE_PIN AP14 IOSTANDARD LVCMOS33} [get_ports {boot_mode_i[1]}]
 
 ######################################################################
 # Test Mode
 ######################################################################
 #set_property -dict {PACKAGE_PIN AM14 IOSTANDARD LVCMOS33} [get_ports test_mode_i]
-
 
