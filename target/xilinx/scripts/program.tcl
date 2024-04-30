@@ -16,21 +16,28 @@ if {$::env(BOARD) eq "genesys2"} {
   set_property PROGRAM.FILE $::env(BIT) [get_hw_devices xc7k325t_0]
   program_hw_devices [get_hw_devices xc7k325t_0]
   refresh_hw_device [lindex [get_hw_devices xc7k325t_0] 0]
+  disconnect_hw_server
 } elseif {$::env(BOARD) eq "vc707"} {
   open_hw_target {$::env(HOST):$::env(PORT)/$::env(FPGA_PATH)}
+  puts $::env{FPGA_PATH}
 
   current_hw_device [get_hw_devices xc7vx485t_0]
   set_property PROGRAM.FILE $::env(BIT) [get_hw_devices xc7vx485t_0]
   program_hw_devices [get_hw_devices xc7vx485t_0]
   refresh_hw_device [lindex [get_hw_devices xc7vx485t_0] 0]
+  disconnect_hw_server
 } elseif {$::env(BOARD) eq "zcu102"} {
-  open_hw_target {$::env(HOST):$::env(PORT)/$::env(FPGA_PATH)}
-
-  current_hw_device [get_hw_devices xczu9_0]
-  set_property PROGRAM.FILE $::env(BIT) [get_hw_devices xczu9_0]
+  current_hw_target [lindex [get_hw_targets] 0]
+  open_hw_target
+  set_property PROGRAM.FILE $::env(BIT) [lindex [get_hw_devices xczu9_0] 0]
+  current_hw_device [lindex [get_hw_devices xczu9_0] 0]
   program_hw_devices [get_hw_devices xczu9_0]
   refresh_hw_device [lindex [get_hw_devices xczu9_0] 0]
+  puts "The FPGA was properly programmed"
+  disconnect_hw_server
+  
 
- else {
+} else {
       exit 1
+      puts "The FPGA was not properly programmed"
 }
