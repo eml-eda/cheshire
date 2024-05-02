@@ -13,7 +13,7 @@ module cheshire_top_xilinx
   //System signals
   input logic         sysclk_p,
   input logic         sysclk_n,
-  input logic         cpu_resetn,
+  input logic         cpu_reset,
   //Boot mode
   input logic         test_mode_i,
   //Test mode
@@ -23,7 +23,7 @@ module cheshire_top_xilinx
   input logic         uart_rx_i,
   //JTAG
   input logic         jtag_tck_i,
-  input logic         jtag_trst_ni,
+  input logic         jtag_trst_i,
   input logic         jtag_tms_i,
   input logic         jtag_tdi_i,
   output logic        jtag_tdo_o,
@@ -31,7 +31,7 @@ module cheshire_top_xilinx
   inout wire          i2c_scl_io,
   inout wire          i2c_sda_io,
   //GPIO
-  inout wire  [29:0]  gpio_io,
+  inout wire  [23:0]  gpio_io,
   //SD
   input logic         sd_cd_i,
   output logic        sd_cmd_o,
@@ -150,9 +150,9 @@ module cheshire_top_xilinx
   wire dram_sync_reset;
   wire soc_clk;
 
-  logic rst_n;
+  wire rst_n;
 
-  assign rst_n = cpu_resetn & ~jtag_trst_ni;
+  assign rst_n = ~cpu_reset & jtag_trst_i;
 
   // Statically assign the response user signals
   // B Channel user
@@ -473,7 +473,7 @@ module cheshire_top_xilinx
 
 
 
-  assign gpio_io_modified = {2'b00, gpio_io};
+  assign gpio_io_modified = {3'b00, gpio_io};
 
 
   // Three state buffer for GPIO
@@ -509,7 +509,7 @@ module cheshire_top_xilinx
   ) i_cheshire_soc (
     .clk_i              ( soc_clk ),
     .rst_ni             ( rst_n   ),
-    .test_mode_i,
+    .test_mode_i        ( test_mode_i ),
     .boot_mode_i        ( boot_mode_i           ),
     .rtc_i              ( rtc_clk_q             ),
     .axi_llc_mst_req_o  ( axi_llc_mst_req ),
@@ -529,7 +529,7 @@ module cheshire_top_xilinx
     .dbg_ext_req_o      ( ),
     .dbg_ext_unavail_i  ( '0 ),
     .jtag_tck_i         ( jtag_tck_i      ),
-    .jtag_trst_ni       ( jtag_trst_ni    ),
+    .jtag_trst_ni       ( 1'b1    ),
     .jtag_tms_i         ( jtag_tms_i      ),
     .jtag_tdi_i         ( jtag_tdi_i      ),
     .jtag_tdo_o         ( jtag_tdo_o      ),
