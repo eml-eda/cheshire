@@ -1158,17 +1158,17 @@ set_property -dict {PACKAGE_PIN AE15 IOSTANDARD LVCMOS33} [get_ports {gpio_io[22
 #Directional Push Button - Center
 set_property -dict {PACKAGE_PIN AG13 IOSTANDARD LVCMOS33} [get_ports {gpio_io[23]}]
 #DIP SW2
-set_property -dict {PACKAGE_PIN AM14 IOSTANDARD LVCMOS33} [get_ports {gpio_io[24]}]
+#set_property -dict {PACKAGE_PIN AM14 IOSTANDARD LVCMOS33} [get_ports {gpio_io[24]}]
 #DIP SW3
-set_property -dict {PACKAGE_PIN AN13 IOSTANDARD LVCMOS33} [get_ports {gpio_io[25]}]
+set_property -dict {PACKAGE_PIN AN13 IOSTANDARD LVCMOS33} [get_ports {gpio_io[24]}]
 #DIP SW4
-set_property -dict {PACKAGE_PIN AN12 IOSTANDARD LVCMOS33} [get_ports {gpio_io[26]}]
+set_property -dict {PACKAGE_PIN AN12 IOSTANDARD LVCMOS33} [get_ports {gpio_io[25]}]
 #DIP SW5
-set_property -dict {PACKAGE_PIN AP12 IOSTANDARD LVCMOS33} [get_ports {gpio_io[27]}]
+set_property -dict {PACKAGE_PIN AP12 IOSTANDARD LVCMOS33} [get_ports {gpio_io[26]}]
 #DIP SW6
-set_property -dict {PACKAGE_PIN AL13 IOSTANDARD LVCMOS33} [get_ports {gpio_io[28]}]
+set_property -dict {PACKAGE_PIN AL13 IOSTANDARD LVCMOS33} [get_ports {gpio_io[27]}]
 #DIP SW7
-set_property -dict {PACKAGE_PIN AK13 IOSTANDARD LVCMOS33} [get_ports {gpio_io[29]}]
+set_property -dict {PACKAGE_PIN AK13 IOSTANDARD LVCMOS33} [get_ports {gpio_io[28]}]
 
 
 
@@ -1216,5 +1216,5 @@ set_property -dict {PACKAGE_PIN AP14 IOSTANDARD LVCMOS33} [get_ports {boot_mode_
 ######################################################################
 # Test Mode
 ######################################################################
-#set_property -dict {PACKAGE_PIN AM14 IOSTANDARD LVCMOS33} [get_ports test_mode_i]
+set_property -dict {PACKAGE_PIN AM14 IOSTANDARD LVCMOS33} [get_ports test_mode_i]
 
