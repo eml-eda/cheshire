@@ -48,7 +48,7 @@ set_property strategy Performance_ExtraTimingOpt [get_runs impl_1]
 
 set_property XPM_LIBRARIES XPM_MEMORY [current_project]
 
-set_param general.maxThreads 8
+set_param general.maxThreads 16
 
 synth_design -rtl -name rtl_1
 
