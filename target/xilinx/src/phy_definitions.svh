@@ -4,6 +4,9 @@
 //
 // Cyril Koenig <cykoenig@iis.ee.ethz.ch>
 
+`define TARGET_ZCU102
+
+
 `ifdef TARGET_VCU128
   `define USE_RESET
   `define USE_JTAG
@@ -30,8 +33,11 @@
 `ifdef TARGET_ZCU102
   `define USE_RESET
   `define USE_JTAG
-  `define USE_DDR4
-  `define USE_VIO
+  `define USE_I2C
+  `define USE_UART
+  `define USE_SWITCHES
+  `define USE_GPIO
+  //`define USE_ILA
 `endif
 
 /////////////////////
