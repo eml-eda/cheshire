@@ -45,3 +45,4 @@ vivado*
 target/xilinx/zcu102*
 target/xilinx/reports
 target/xilinx/.Xil
+target/xilinx/ips/ILA*
