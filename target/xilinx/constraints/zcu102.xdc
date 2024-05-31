@@ -9,8 +9,9 @@ set_property CLOCK_BUFFER_TYPE NONE [get_nets -of [get_ports jtag_tck_i]]
 
 # Reset
 
-set_false_path -from [get_ports cpu_reset]
-set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets cpu_reset_IBUF_inst/O]
+#set_false_path -from [get_ports cpu_reset]
+#set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets -hierarchical cpu_reset_IBUF]
+                                                   
 
 # Hyperbus
 # 10MHz
