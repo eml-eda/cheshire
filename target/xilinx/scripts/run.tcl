@@ -43,6 +43,7 @@ update_compile_order -fileset sources_1
 add_files -fileset constrs_1 -norecurse $current_directory/../constraints/$project.xdc
 add_files -fileset constrs_1 -norecurse $current_directory/../constraints/cheshire.xdc
 
+
 set_property strategy Flow_PerfOptimized_high [get_runs synth_1]
 set_property strategy Performance_ExtraTimingOpt [get_runs impl_1]
 
@@ -57,7 +58,9 @@ set_property STEPS.SYNTH_DESIGN.ARGS.RETIMING true [get_runs synth_1]
 launch_runs synth_1
 wait_on_run synth_1
 
+add_files -fileset constrs_1 -norecurse $current_directory/../constraints/imp_constraints.xdc
 update_compile_order -fileset sources_1
+
 open_run synth_1 -name synth_1
 
 # Get all nets of the design
@@ -76,8 +79,7 @@ foreach net $all_nets {
 
 puts $nets_to_set
 
-#The name of the core is "ila". We are using the ip "ila_0"
-create_debug_core ila_0 ila
+
 
 
 #Know the number of the nets to add
@@ -85,6 +87,8 @@ set length [llength $nets_to_set]
 
 # Print the list of nets marked for debug
 if {$length > 0} {
+      #The name of the core is "ila". We are using the ip "ila_0"
+      create_debug_core ila_0 ila
       puts "The signals marked for debug are:"
       for {set index 0} {$index <= $length - 1} {incr index} {
 
@@ -118,6 +122,9 @@ report_utilization -hierarchical                                        -file re
 report_cdc                                                              -file reports/$project.cdc.rpt
 report_clock_interaction                                                -file reports/$project.clock_interaction.rpt
 
+
+
+
 set_property STEPS.POST_ROUTE_PHYS_OPT_DESIGN.ARGS.DIRECTIVE AggressiveExplore [get_runs impl_1]
 launch_runs impl_1
 wait_on_run impl_1
@@ -126,24 +133,24 @@ launch_runs impl_1 -to_step write_bitstream -jobs 16
 wait_on_run impl_1
 
 #Check timing constraints
-# open_run impl_1
-# set timingrep [report_timing_summary -no_header -no_detailed_paths -return_string]
-# if {[info exists ::env(CHECK_TIMING)] && $::env(CHECK_TIMING)==1} {
-#       if {! [string match -nocase {*timing constraints are met*} $timingrep]} {
-#             send_msg_id {USER 1-1} ERROR {Timing constraints were not met.}
-#             return -code error
-#       }
-# }
+open_run impl_1
+set timingrep [report_timing_summary -no_header -no_detailed_paths -return_string]
+if {[info exists ::env(CHECK_TIMING)] && $::env(CHECK_TIMING)==1} {
+      if {! [string match -nocase {*timing constraints are met*} $timingrep]} {
+            send_msg_id {USER 1-1} ERROR {Timing constraints were not met.}
+            return -code error
+      }
+}
 
 # # output Verilog netlist + SDC for timing simulation
 # write_verilog -force -mode funcsim out/${project}_funcsim.v
 # write_verilog -force -mode timesim out/${project}_timesim.v
 # write_sdf     -force out/${project}_timesim.sdf
 
-# # reports
-# exec mkdir -p reports/
-# exec rm -rf reports/*
-# check_timing                                                              -file reports/${project}.check_timing.rpt
-# report_timing -max_paths 100 -nworst 100 -delay_type max -sort_by slack   -file reports/${project}.timing_WORST_100.rpt
-# report_timing -nworst 1 -delay_type max -sort_by group                    -file reports/${project}.timing.rpt
-# report_utilization -hierarchical                                          -file reports/${project}.utilization.rpt
+# reports
+exec mkdir -p reports/
+exec rm -rf reports/*
+check_timing                                                              -file reports/${project}.check_timing.rpt
+report_timing -max_paths 100 -nworst 100 -delay_type max -sort_by slack   -file reports/${project}.timing_WORST_100.rpt
+report_timing -nworst 1 -delay_type max -sort_by group                    -file reports/${project}.timing.rpt
+report_utilization -hierarchical                                          -file reports/${project}.utilization.rpt
