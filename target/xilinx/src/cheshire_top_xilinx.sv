@@ -19,9 +19,6 @@ module cheshire_top_xilinx
   `endif
 
   `ifdef USE_UART
-  //UART
-  //(* dont_touch = "yes" *) (* mark_debug = "true" *) output logic        uart_tx_o,
-  //(* dont_touch = "yes" *) (* mark_debug = "true" *) input logic         uart_rx_i,
   output logic        uart_tx_o,
   input logic         uart_rx_i,
   `endif
@@ -43,7 +40,7 @@ module cheshire_top_xilinx
 
   `ifdef USE_GPIO
   //GPIO
-  inout wire  [23:0]  gpio_io,
+  inout wire  [28:0]  gpio_io,
   `endif
 
   `ifdef USE_SD
@@ -76,6 +73,22 @@ module cheshire_top_xilinx
   input logic         sysclk_n,
   input logic         cpu_reset
 );
+
+  //Signals marked for debugging(The synthetizer don't optimize them)
+  //UART
+  // `ila(uart_tx_o_d, uart_tx_o);
+  // `ila(uart_rx_i_d, uart_rx_i);
+  //Modes --switches
+  // `ila(test_mode_i_d, test_mode_i);
+  // `ila(boot_mode_i_d, boot_mode_i);
+  //I2C
+//  `ila(i2c_sda_soc_out_d, i2c_sda_soc_out);
+//  `ila(i2c_sda_soc_in_d, i2c_sda_soc_in);
+//  `ila(i2c_scl_soc_in_d, i2c_scl_soc_in);
+//  `ila(i2c_scl_soc_out_d, i2c_scl_soc_out);
+//  `ila(i2c_sda_en_d, i2c_sda_en);
+//  `ila(i2c_scl_en_d, i2c_scl_en);
+
 
   // Configure cheshire for FPGA mapping
   localparam cheshire_cfg_t FPGACfg = '{
@@ -174,7 +187,6 @@ module cheshire_top_xilinx
   wire dram_clock_out;
   wire dram_sync_reset;
   wire soc_clk;
-
   wire rst_n;
 
   assign rst_n = ~cpu_reset & jtag_trst_i;
@@ -496,29 +508,46 @@ module cheshire_top_xilinx
   // GPIO Adaption //
   //////////////////
 
-  logic [31:0] gpio_in;
-  logic [31:0] gpio_out;
-  logic [31:0] gpio_io_modified;
-  logic gpio_en;
+  logic [28:0] gpio_in;
+  logic [28:0] gpio_out;
+  logic [28:0] gpio_en;
+
+
+  logic [31:0] gpio_out_modified;
+  logic [31:0] gpio_in_modified;
+  logic [31:0] gpio_en_modified;
 
 
 
-  assign gpio_io_modified = {3'b00, gpio_io};
+  assign gpio_out_modified = {3'b00, gpio_out};
+  assign gpio_in_modified =  {3'b00, gpio_in};
+  assign gpio_en_modified =  {3'b00, gpio_en};
+
+
+  multi_bit_iobuf #(
+    .size      (29)
+  ) gpio_iobuf (
+    .bidirectional  ( gpio_io ), //Buffer inout port
+    .data_in ( gpio_out ), 
+    .data_out  ( gpio_in ), 
+    .oe  ( ~gpio_en     ) //3-state enable input, high = input, low = output
+  );
+  `endif
 
 
   // Three state buffer for GPIO
-  IOBUF #(
-    .DRIVE        ( 12        ),
-    .IBUF_LOW_PWR ( "FALSE"   ),
-    .IOSTANDARD   ( "DEFAULT" ),
-    .SLEW         ( "FAST"    )
-  ) gpio_iobuf (
-    .O  ( gpio_in             ), //Buffer output
-    .IO ( gpio_io_modified             ), //Buffer inout port
-    .I  ( gpio_out            ), //Buffer input
-    .T  ( ~gpio_en            ) //3-state enable input, high = input, low = output
-  );
-  `endif
+  // IOBUF #(
+  //   .DRIVE        ( 12        ),
+  //   .IBUF_LOW_PWR ( "FALSE"   ),
+  //   .IOSTANDARD   ( "DEFAULT" ),
+  //   .SLEW         ( "FAST"    )
+  // ) gpio_iobuf (
+  //   .O  ( gpio_in             ), //Buffer output
+  //   .IO ( gpio_io_modified             ), //Buffer inout port
+  //   .I  ( gpio_out            ), //Buffer input
+  //   .T  ( ~gpio_en            ) //3-state enable input, high = input, low = output
+  // );
+  // `endif
 
 
   //////////////////
@@ -577,9 +606,9 @@ module cheshire_top_xilinx
     `endif
 
     `ifdef USE_GPIO
-    .gpio_i             ( gpio_in         ),
-    .gpio_o             ( gpio_out        ),
-    .gpio_en_o          ( gpio_en         ),
+    .gpio_i             ( gpio_in_modified  ),
+    .gpio_o             ( gpio_out_modified ),
+    .gpio_en_o          ( gpio_en_modified  ),
     `endif
 
     .slink_rcv_clk_i    ( '1 ),
@@ -616,28 +645,6 @@ module cheshire_top_xilinx
     .dbg_ext_req_o      ( ),
     .dbg_ext_unavail_i  ( '0 )
   );
-
-`ifdef USE_ILA
- ila_0 ILA_inst (
-   .clk(soc_clk),
-   //.probe0(test_mode_i), // PROBE0 - size = 1
-   //.probe1(boot_mode_i), // PROBE1 - size = 2
-   //.probe2(jtag_tck_i), // PROBE2 - size = 1
-   //.probe3(jtag_tms_i), // PROBE3 - size = 1
-   //.probe4(jtag_tdi_i), // PROBE4 - size = 1
-   //.probe5(jtag_tdo_o), // PROBE5 - size = 1
-   .probe0(uart_tx_o), // PROBE6 - size = 1
-   .probe1(uart_rx_i) // PROBE7 - size = 1
-   //.probe8(i2c_sda_soc_out), // PROBE8 - size = 1
-   //.probe9(i2c_sda_soc_in), // PROBE9 - size = 1
-   //.probe10(i2c_sda_en), // PROBE10 - size = 1
-   //.probe11(i2c_scl_soc_out),  // PROBE11 - size = 1
-   //.probe12(i2c_scl_soc_in), // PROBE12 - size = 1
-   //.probe13(i2c_scl_en), // PROBE13 - size = 1
-   //.probe14(gpio_en) // PROBE16 - size = 1
- );
-`endif
-
 
 
 endmodule

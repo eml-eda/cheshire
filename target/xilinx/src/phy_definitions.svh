@@ -37,7 +37,6 @@
   `define USE_UART
   `define USE_SWITCHES
   `define USE_GPIO
-  //`define USE_ILA
 `endif
 
 /////////////////////

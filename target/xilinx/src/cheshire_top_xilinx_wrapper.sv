@@ -14,7 +14,7 @@ module cheshire_top_xilinx_wrapper (
     input logic         jtag_tdi_i,
     output logic        jtag_tdo_o,
     //UART
-    input logic         uart_tx_o,
+    output logic        uart_tx_o,
     input logic         uart_rx_i,
     //I2C
     inout wire          i2c_scl_io,
