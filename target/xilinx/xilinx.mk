@@ -11,6 +11,8 @@ BOARD          = zcu102
 XILINX_PORT  ?= 3121
 XILINX_HOST  ?= imodium.polito.it
 
+BENDER ?= bender
+
 
 ifeq ($(BOARD),genesys2)
 	XILINX_PART  ?= xc7k325tffg900-2
@@ -67,13 +69,11 @@ ip-dir  := xilinx
 
 all: $(bit)
 
-# Generate mcs from bitstream
-$(mcs): $(bit)
-	$(VIVADOENV) $(VIVADO) $(VIVADOFLAGS) -source scripts/write_cfgmem.tcl -tclargs $@ $^
-
 $(bit): $(ips)
 	@mkdir -p $(out)
-	$(VIVADOENV) $(VIVADO) $(VIVADOFLAGS) -source scripts/prologue.tcl -source scripts/run.tcl
+	$(BENDER) script vivado -t fpga -t cv64a6_imafdcsclic_sv39 -t cva6 > scripts/add_sources.tcl
+	# $(VIVADOENV) $(VIVADO) $(VIVADOFLAGS) -source scripts/prologue.tcl -source scripts/run.tcl
+	 $(VIVADOENV) $(VIVADO) $(VIVADOFLAGS) -source ips/ILA/run.tcl -source scripts/prologue.tcl -source scripts/run.tcl
 	cp $(PROJECT).runs/impl_1/cheshire_top_xilinx_wrapper* ./$(out)
 
 $(ips):
@@ -90,7 +90,11 @@ program:
 	@echo "Programming board $(BOARD) ($(XILINX_PART))"
 	$(VIVADOENV) $(VIVADO) $(VIVADOFLAGS) -source scripts/program.tcl
 
+program-ILA:
+	@echo "Programming board $(BOARD) ($(XILINX_PART))"
+	$(VIVADOENV) $(VIVADO) -nojournal -mode gui -source scripts/programwithILA.tcl
+
 clean:
-	rm -rf *.log *.jou *.str *.mif *.xci *.xpr .Xil/ $(out) $(PROJECT).cache $(PROJECT).hw $(PROJECT).ioplanning $(PROJECT).ip_user_files $(PROJECT).runs $(PROJECT).sim reports/
+	rm -rf *.log *.jou *.str *.mif *.xci *.xpr .Xil/ $(out) $(PROJECT).cache $(PROJECT).hw $(PROJECT).ioplanning $(PROJECT).ip_user_files $(PROJECT).runs $(PROJECT).gen $(PROJECT).srcs $(PROJECT).sim reports/ ./ips/ILA/ila_0.*
 
 .PHONY: clean
