@@ -40,6 +40,7 @@ sources:
   - hw/regs/cheshire_reg_top.sv
   - hw/cheshire_pkg.sv
   - hw/cheshire_soc.sv
+  - hw/multi_bit_iobuf.sv
 
   - target: any(simulation, test)
     files:
